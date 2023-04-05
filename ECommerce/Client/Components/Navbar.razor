@@ -1,0 +1,63 @@
+﻿
+<nav class="navbar">
+
+    <!-- LOGO -->
+
+    <div class="logo navbar-brand ">S<MudAvatar Color="Color.Tertiary">u</MudAvatar>K<MudAvatar Color="Color.Secondary">a</MudAvatar></div>
+
+    <!-- NAVIGATION MENU -->
+
+    <div class="nav-links">
+        <!-- NAVIGATION MENUS -->
+        @*<a href="/login" class="btn btn-secondary"><i class="oi oi-account-login"> </i>  Login</a>*@
+
+        <MudButton ButtonType="ButtonType.Button" Href="/login" Color="Color.Default" Style="background-color:#4c9e9e;" Size="Size.Large">
+            <MudIcon Icon="@Icons.Material.Filled.Login"></MudIcon>&thinsp; Login</MudButton>
+    </div>
+
+</nav>
+<style>
+    /* NAVBAR STYLING STARTS */
+
+    .navbar {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         padding: 10px;
+         background-color: white;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links a {
+         color: white;
+         cursor:pointer;
+    }
+
+    /* LOGO */
+
+    .logo {
+         font-size: 32px;
+    }
+
+    /* NAVBAR MENU */
+
+    .menu {
+         display: flex;
+         gap: 1em;
+         font-size: 18px;
+    }
+
+        .menu li:hover {
+             background-color: #4c9e9e;
+             border-radius: 5px;
+             transition: 0.3s ease;
+        }
+
+        .menu li {
+             padding: 5px 14px;
+        }
+</style>
+
+@code {
+
+}

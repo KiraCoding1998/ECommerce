@@ -1,0 +1,108 @@
+﻿@page "/create"
+@using ECommerce.Shared.Models;
+@using Microsoft.AspNetCore.Authorization;
+@layout SecondaryLayout
+@attribute [Authorize(Roles ="True")]
+@inject ISnackbar Snackbar
+<PageTitle>Create</PageTitle>
+
+
+@if(_addAllProcessing)
+{
+    <MudOverlay Visible="true" Style="width:100%; height:100%;" LightBackground="true" ZIndex="9999" AutoClose="true" >
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudOverlay>
+}
+
+<div class="d-flex flex-column gap-1" style="position:fixed; bottom:0; right:0; padding:5px; margin:10px; z-index:100;">
+    
+    <MudTooltip Text="Save All">
+        <MudIconButton OnClick="AddAll" Icon="@Icons.Material.Filled.Save" Style="border-radius:50%;padding:10px;" Variant="Variant.Filled" Color="Color.Warning" Size="Size.Large" />
+    </MudTooltip>
+    <MudIconButton OnClick="AddProductCard" Icon="@Icons.Material.Filled.Add" Style="border-radius:50%; padding:10px;" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" />
+@*<MudIconButton OnClick="AddProduct" Icon="@Icons.Material.Filled.Save" Style="border-radius:50%; position:fixed; bottom:0; right:0; padding:15px; margin:10px; z-index:100;" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" />*@
+</div>
+<MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+  <div class="row" style="width:100%;height:100vh;">
+        <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">            
+  
+            @foreach(var product in _products)
+            {
+                fileInputId = $"fileInputId-{uniqueId}";
+                <ECommerce.Client.Components.EditableProductCard FileInputIdentifier="@fileInputId" Product="product" OnSave="() => AddProduct(product)" OnRemoveCard="() => RemoveProductCard(product)"></ECommerce.Client.Components.EditableProductCard>
+                uniqueId = uniqueId + 1;
+            }
+
+        </div>
+  </div>
+</MudPaper>
+
+
+
+@code{
+    private List<ProductDto> _products = new List<ProductDto>();
+    private int uniqueId = 1;
+    private string fileInputId = string.Empty;
+    private bool _addAllProcessing = false;
+
+
+    [Inject]
+    public HttpClient Http { get; set; }
+
+    private void AddProductCard()
+    {
+        _products.Add(new ProductDto());
+    }
+    private void RemoveProductCard(ProductDto product)
+    {
+        _products.Remove(product);
+    }
+    private async Task AddProduct(ProductDto Product)
+    {
+        var response = await Http.PostAsJsonAsync<ProductDto>("api/products/addproduct", Product);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = response.Content.ReadFromJsonAsync<ProductDto>();
+            _products.Remove(Product);
+            Snackbar.Add("Product Has been successfully Added!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to add product", Severity.Error);
+        }
+    }
+    private async Task AddAll()
+    {
+
+        _addAllProcessing = true;
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"api/products/addAllproducts", _products);
+            var failedToAdd = await response.Content.ReadFromJsonAsync<List<ProductDto>>();
+
+            if (failedToAdd != null)
+            {
+                _products = failedToAdd;
+            }
+
+            _addAllProcessing = false;
+        }
+        catch
+        {
+            _addAllProcessing = false;
+            Snackbar.Add("Error occurred while processing.. please check your inputs", Severity.Error);
+        }
+
+
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        _products.Add(new ProductDto());
+        return base.OnInitializedAsync();   
+    }
+
+
+
+}

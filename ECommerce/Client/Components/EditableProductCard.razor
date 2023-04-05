@@ -1,0 +1,126 @@
+﻿@using ECommerce.Shared.Models;
+
+
+
+<Animate Animation="Animations.FadeDown" Duration="TimeSpan.FromSeconds(0.25)">
+
+<EditForm Model="Product" OnValidSubmit="SaveEventInvoker" style="width: 18rem;" class="test">
+
+    <DataAnnotationsValidator/>
+
+        <div class="card product-content" style="width: 18rem;" >
+
+@*        <div class="btn btn-sm" hidden="@isCloseButtonHidden">
+                <MudIcon  Icon="@Icons.Material.Filled.Close" @onclick="HideCard" ButtonType="ButtonType.Button" Color="Color.Dark" Variant="Variant.Filled" FullWidth="true">close</MudIcon>
+         </div>*@
+
+         <div class="d-flex align-items-end justify-content-end">
+                <MudIconButton hidden="@HideCloseButton" Disabled="@_clickedRemove" OnClick="RemoveCardEventInovker"  Color="Color.Default" Style="position:absolute;top:3px;right:5px;cursor:pointer;height:3px ; width:3px">
+                    @if(!_processingRemove)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Close"></MudIcon>    
+                    }
+                </MudIconButton>
+         </div>
+
+        <ImageUploaderWithView  FileInputIdentifier="@FileInputIdentifier" BindImageToObjectField="Product" ImagePlaceHolder="images/add_image.png"></ImageUploaderWithView>
+
+     <div class="card-body">
+
+         <MudTextField Placeholder="Product Name" T="string" @bind-Value="Product.ProductName"></MudTextField>
+         <ValidationMessage For="(() => Product.ProductName)"></ValidationMessage>
+
+         <MudTextField Placeholder="Description" T="string" @bind-Value="Product.Description"></MudTextField>
+            <ValidationMessage For="(() => Product.Description)"></ValidationMessage>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><MudNumericField Min="0" @bind-Value="Product.Price" Placeholder="Price" Label="In dollars($)" Variant="Variant.Outlined"></MudNumericField></li>
+                <ValidationMessage For="(() => Product.Price)"></ValidationMessage>
+
+            </ul>
+
+            <div class="card-body">
+                <p class="card-text-light">
+                    <MudNumericField Min="0" class="number-description"  Label="pieces available" Variant="Variant.Outlined" @bind-Value="Product.PiecesAvaliable"></MudNumericField>
+                    <ValidationMessage For="(() => Product.PiecesAvaliable)">asdasdsadasd</ValidationMessage>
+                </p>
+            </div>
+     </div>
+        <div class="card-footer">
+                <MudButton FullWidth="true" Disabled="@_clickedSave" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save">
+                    @if (_prcoessingSave)
+                    {
+                        <MudText Class="ms-2">Saving..</MudText>
+                    }
+                else
+                    {
+                        <MudText>Save</MudText>
+                    }
+            </MudButton>
+        </div>
+
+    </div>
+</EditForm>
+</Animate>
+
+<style>
+
+    .product-content:hover {
+        box-shadow: 0 0 11px rgba(33,33,33,.2);
+        transform: translate(0px, -8px);
+        transition: .6s;
+    }
+
+
+</style>
+
+
+@code {
+    [Parameter]
+    public string FileInputIdentifier { get; set; } = default!;
+
+    [Parameter]
+    public bool HideCloseButton { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnRemoveCard { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave  { get; set; }
+
+    [Parameter]
+    public ProductDto Product { get; set; } = new ProductDto();
+
+    private bool _prcoessingSave = false;
+    private bool _clickedSave = false;
+
+    private bool _processingRemove = false;
+    private bool _clickedRemove = false;
+
+    private async Task RemoveCardEventInovker()
+    {
+        _processingRemove = true;
+        _clickedRemove = true;
+
+        await OnRemoveCard.InvokeAsync();
+
+        _processingRemove = false;
+        _clickedRemove = false;
+
+    }
+
+    private async Task SaveEventInvoker()
+    {
+        _clickedSave = true;
+        _prcoessingSave = true;
+        await OnSave.InvokeAsync();
+        _prcoessingSave = false;
+        _clickedSave = false; //in case an error happened in OnSave
+
+    }
+
+
+
+
+
+}

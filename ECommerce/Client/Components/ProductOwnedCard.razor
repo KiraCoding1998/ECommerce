@@ -1,0 +1,96 @@
+﻿@using ECommerce.Shared.Models;
+
+
+
+<div class="card product-content" style="width: 18rem;">
+
+    @if (Product!.ProductImage != null && Product.ProductImage?.Length != 0)
+    {
+        <img src="data:image;base64,@Convert.ToBase64String(Product.ProductImage!)" class="card-img-top product-img"  />
+    }
+    else
+    {
+        <img src="/images/noImageAvailable2.png" class="card-img-top product-img" alt="product">
+    }
+
+    <div class="card-body">
+        <h4 class="card-title">@Product!.ProductName</h4>
+        <p class="card-text">@Product.ProductDescription</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"><h6>$@Product.ProductPrice</h6></li>
+    </ul>
+    <div class="card-body">
+        <p class="card-text-light">
+            Own:
+            <span class="number-description"> @Product.ClientHas</span>
+        </p>
+    </div>
+</div>
+
+<style>
+
+
+    .card-body {
+        margin-bottom: -8px;
+    }
+
+    .product-content {
+        padding: 2px;
+        width: 24%;
+        margin: 15px;
+        box-sizing: border-box;
+        float: left;
+        text-align: center;
+        border-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: .4s;
+    }
+
+    .product-img {
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    .product-content:hover {
+        box-shadow: 0 0 11px rgba(33,33,33,.2);
+        transform: translate(0px, -8px);
+        transition: .6s;
+    }
+
+    p {
+        text-align: center;
+        color: #b2bec3;
+        padding: 0 8px;
+        font-family: Nunito Sans;
+    }
+
+
+    h6 {
+        font-size: 26px;
+        text-align: center;
+        color: #222f3e;
+        margin: 0;
+        font-family: Nunito Sans;
+    }
+
+
+    .number-description {
+        font-size: 20px;
+        text-align: center;
+        color: #222f3e;
+        margin: 0;
+        font-family: Nunito Sans;
+    }
+
+</style>
+
+@code {
+    [Parameter]
+    public OwnedProductModel? Product { get; set; } = new OwnedProductModel();
+
+}

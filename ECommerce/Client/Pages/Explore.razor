@@ -1,0 +1,236 @@
+﻿@page "/explore"
+@using ECommerce.Client.Classes;
+@using ECommerce.Shared.Models;
+@using Microsoft.AspNetCore.Authorization;
+@using System.Security.Claims;
+@layout SecondaryLayout
+@inject ISnackbar Snackbar
+@attribute [Authorize(Roles ="True,False,ViewUser")]
+
+<div class="d-flex flex-column gap-1" style="position:fixed; bottom:0; right:0; padding:5px; margin:10px; z-index:100;">
+
+    <MudTooltip Arrow="true" Text="View as a client">
+        <MudIconButton OnClick="ViewAsAClient" Icon="@Icons.Material.Filled.RemoveRedEye" Style="border-radius:50%;padding:10px;" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" />
+    </MudTooltip>
+    <MudIconButton OnClick="ShowSearchField" Icon="@Icons.Material.Filled.Search" Style="border-radius:50%;padding:10px;" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" />
+
+</div>
+
+@if(_isloading)
+{
+        <div class="container position-absolute top-50 bottom-50" style="left:25%;right:25%;">
+            <ECommerce.Client.Components.MainLoader />
+        </div>
+
+}
+else
+{
+    if(_products!.Count == 0)
+    {
+       <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+         <div class="row" style="width:100%;height:100vh;">
+            <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">
+                <MudText Align="Align.Center" Typo="Typo.caption"> No producs available atm</MudText>
+            </div>
+         </div>
+       </MudPaper>
+    }
+}
+
+<div class="container" hidden="@isSearchFieldHidden">
+    <ECommerce.Client.Components.SearchBox OnSearch="SearchProducts" Style="color:white; position:fixed; width:40%;bottom:14px;right:15px; padding:12px;z-index:99;border-radius:40px"></ECommerce.Client.Components.SearchBox>
+</div>
+
+
+@* Admin *@
+<AuthorizeView Roles="True">
+    <Authorized>
+        <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+         <div class="row" style="width:100%;height:100vh;">
+            <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">     
+                    @foreach (var product in _products!)
+                    {
+                          fileInput = $"fileInputId-{uniqueId}";
+                          <ECommerce.Client.Components.EditableProductCard  FileInputIdentifier="@fileInput" Product="product" OnRemoveCard="() => RemoveProduct(product)" OnSave="() => UpdateProduct(product)"></ECommerce.Client.Components.EditableProductCard>
+                          uniqueId = uniqueId + 1;
+                    }
+            </div>
+          </div>
+        </MudPaper>
+    </Authorized>
+</AuthorizeView>
+
+@* User *@
+<AuthorizeView Roles="False,ViewUser">
+    <Authorized>
+        <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+            <div class="row" style="width:100%;height:100vh;">
+                <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">
+                    @foreach (var product in _products!)
+                    {
+                        if(product.PiecesAvaliable != 0)
+                        {
+                          <ECommerce.Client.Components.ProductCard OnAddToCart="() => AddToCart(product)" Product="product"></ECommerce.Client.Components.ProductCard>
+                        }
+                    }
+                </div>
+            </div>
+        </MudPaper>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    private static List<ProductDto>? _products = new List<ProductDto>();
+    private int uniqueId = 1;
+    private string fileInput = string.Empty;
+    private bool isSearchFieldHidden = true;
+    private bool _isloading = false;
+
+
+    [Inject]
+    public HttpClient Http { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? authenticationState { get; set; }
+
+    [Inject]
+    public AuthenticationStateProvider? StateProvider { get; set; }
+
+    private async Task GetProducts()
+    {
+        var response = await Http.GetFromJsonAsync<List<ProductDto>>("api/products/getallproducts");
+
+        if(response != null || response?.Count > 0)
+        {
+            _products = response;
+        }
+    }
+    private async Task RemoveProduct(ProductDto product)
+    {
+        var response = await Http.DeleteFromJsonAsync<bool>($"api/products/deleteproduct/{product.Id}");
+
+        if(response == true )
+        {
+            _products!.Remove(product);
+            Snackbar.Add("Item was deleted Successfully", Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add("Failed to delete item", Severity.Info);
+            _products!.Add(product);
+        }
+    }
+    private async Task UpdateProduct(ProductDto product)
+    {
+        var response = await Http.PostAsJsonAsync("api/products/updateproduct", product);
+
+        if(response.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Item was updated Successfully", Severity.Success);
+        }
+
+        else
+        {
+            Snackbar.Add("Failed to update item", Severity.Error);
+        }
+    }
+    private async Task SearchProducts(string searchText)
+    {
+        if(!string.IsNullOrEmpty(searchText) || !string.IsNullOrWhiteSpace(searchText))
+        {
+            var response = await Http.GetFromJsonAsync<List<ProductDto>>($"api/products/searchproduct/{searchText}");
+
+            if (response != null)
+            {
+                _products = response;
+            }
+        }
+        else
+        {
+            await GetProducts();
+        }
+
+    }
+    private async Task AddToCart(ProductDto product)
+    {
+        var response = await Http.PostAsJsonAsync($"api/clients/addtoCart", product);
+
+        if(response.IsSuccessStatusCode)
+        {
+            product.PiecesAvaliable--;
+        }
+
+    }
+    private async Task GetAvailableProducts()
+    {
+        var availableProducts = await Http.GetFromJsonAsync<List<ProductDto>>($"api/products/getavailableproducts");
+
+        if(availableProducts != null)
+        {
+            _products = availableProducts;
+        }
+    }
+    private void ShowSearchField()
+    {
+        isSearchFieldHidden = !isSearchFieldHidden;
+    }
+    private async Task ViewAsAClient()
+    {
+        var state = await authenticationState!;
+
+        if(state != null)
+        {
+            var user = state.User;
+            var currentRole = user.FindFirst(ClaimTypes.Role);
+
+            //claims identity => claims related to this identity(user can have multiple identities)
+            var claimsIdentity = (ClaimsIdentity) user?.Identity!;
+            var customAuthProvider = (CustomAuthenticationStateProvider?) StateProvider;
+
+            if(currentRole!.Value.Contains("ViewUser"))
+            {
+                claimsIdentity.RemoveClaim(currentRole);
+                claimsIdentity.AddClaim(new Claim (ClaimTypes.Role , "True"));
+                customAuthProvider?.UpdateAuthenticationState(claimsIdentity);
+            }
+
+            else
+            {
+                claimsIdentity.RemoveClaim(currentRole);
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "ViewUser"));
+                customAuthProvider?.UpdateAuthenticationState(claimsIdentity);
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isloading = true;
+
+        var state = await authenticationState!;
+
+        if(state != null)
+        {
+
+
+            var role = state.User.FindFirst(ClaimTypes.Role);
+
+            //client
+            if(role!.Value.Contains("False") || role.Value.Contains("ViewUser"))
+            {
+                await GetAvailableProducts();
+            }
+
+            //admin
+            else
+            {
+                await GetProducts();
+            }
+        }
+
+        _isloading = false;
+    }
+
+
+}

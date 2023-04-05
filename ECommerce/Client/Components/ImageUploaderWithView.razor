@@ -1,0 +1,85 @@
+﻿@using ECommerce.Client.Classes;
+@using ECommerce.Shared.Models;
+
+
+<div class="custom-file">
+    <InputFile accept="img/*" class="custom-file-input opacity-0" style="width:0px; height:0px;" id="@FileInputIdentifier" OnChange="UploadImage"></InputFile>
+    <div class="container text-center" >
+        <label class="custom-file-label" for="@FileInputIdentifier">
+            <img src="@ImagePlaceHolder" width="100" hidden="@isPlaceHolderHidden" style="cursor:pointer;" />
+            <span style="color:red;display:block;" hidden="@isErrorHidden">@errorMessage</span>
+            <img src="data:image;base64,@Convert.ToBase64String(UploadedImageFile!)" class="card-img-top product-img" width="120" hidden="@(!isPlaceHolderHidden)" style="cursor:pointer;" />
+        </label>
+    </div>
+</div>
+
+
+
+<style>
+    .product-img {
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+</style>
+
+
+@* This will be generic Later (GetPropertyName and stuff) *@
+
+@code{
+    [Parameter]
+    public string ImagePlaceHolder { get; set; } = string.Empty;
+
+    [Parameter]
+    public ProductDto BindImageToObjectField { get; set; } = default!;
+
+    [Parameter]
+    public string FileInputIdentifier { get; set; } = string.Empty;
+
+    [Parameter]
+    public byte[]? UploadedImageFile { get; set; } = { };
+
+    private string errorMessage = "This file is not appropraite";
+    private bool isErrorHidden = true;
+    private bool isPlaceHolderHidden = false;
+
+    public async Task UploadImage(InputFileChangeEventArgs importedFile)
+    {
+        if((importedFile.File != null))
+        {
+            string fileType = importedFile.File.ContentType;
+
+            if(ImageUploadHandler.IsValidImageFile(fileType))
+            {
+                isPlaceHolderHidden = true;
+                UploadedImageFile = await ImageUploadHandler.GetImageAsByteArray(importedFile.File);
+
+                BindImageToObjectField.ProductImage = UploadedImageFile;
+
+                isErrorHidden = true;
+            }
+
+            else
+            {
+                isErrorHidden = false;
+                isPlaceHolderHidden = false;
+            }
+        }
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if(BindImageToObjectField.ProductImage != null)
+        {
+            UploadedImageFile = BindImageToObjectField.ProductImage;
+            isPlaceHolderHidden = true;
+            isErrorHidden = true;
+            StateHasChanged();
+        }
+
+        return Task.CompletedTask;
+    }
+
+}

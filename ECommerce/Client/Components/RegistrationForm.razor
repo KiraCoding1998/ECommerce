@@ -1,0 +1,141 @@
+﻿
+@using ECommerce.Shared.Models;
+
+@*<div class="d-flex justify-content-center align-items-center">
+<EditForm class="form " Model="Client" OnValidSubmit="Register" OnInvalidSubmit="Clear">
+    
+    <DataAnnotationsValidator />
+        <div class="row w-50" style="box-shadow: 0 0 11px rgba(33,33,33,.2);">
+            <div class="col p-2" style="background-color:#594ae2;border-bottom-left-radius:5px;border-top-left-radius:5px;">
+
+                <div class="container p-2 d-flex flex-column"  >
+
+                    <MudText Align="Align.Center" Style="color:white">
+                        <MudIcon Icon="@Icons.Material.Filled.Store" Size="Size.Large" Style="color:white;"></MudIcon>
+                        Suka Online Store
+                    </MudText>
+                    <MudSpacer></MudSpacer>
+
+                    <span class="text-white mt-4 p-4 text-start">
+                        <MudText>
+                            <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Large" Style="color:white;"></MudIcon>
+                            Discover the latest Products at Suka.
+                            Shop with ease and convenience from the comfort of your own home.
+                            Get ready to elevate your Shopping game with us!
+                        </MudText>
+                    </span>
+
+                    <MudButton OnClick="NavigateToLogin" ButtonType="ButtonType.Button" Style="background-color:white;color:#594ae2" FullWidth="true">Login</MudButton>
+           
+                </div>
+            </div>
+
+
+
+            <div class="col p-5" style="background-color:white">
+
+                <div class="container d-flex flex-column gap-1 my-auto">
+
+                    <MudText Typo="Typo.h5">
+                        <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary"></MudIcon>
+                        Register
+                    </MudText>
+
+                    <MudTextField @bind-Value="Client.Username" Label="username" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.SupervisedUserCircle" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                    <ValidationMessage For="(() => Client.Username)"></ValidationMessage>
+                    <p style="color:red">@usernameExistsError</p>
+
+
+                    <MudTextField InputType="InputType.Password" @bind-Value="Client.Password" Label="password" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Lock" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                    <ValidationMessage For="(() => Client.Password)"></ValidationMessage>
+
+ 
+
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Class="mt-3" Variant="Variant.Filled" FullWidth="true">Register</MudButton>
+                </div>
+           </div>
+        </div>
+
+</EditForm>
+</div>
+*@
+
+
+
+
+
+
+
+
+<MudContainer Style="padding-top: 80px;overflow:clip">
+    <EditForm class="form" Model="Client" OnValidSubmit="Register" OnInvalidSubmit="Clear">
+
+        <DataAnnotationsValidator />
+        <div class="row w-50" style="box-shadow: 0 0 11px rgba(33,33,33,.2);min-width:250px;overflow:hidden;border-radius:5px;">
+            <div class="col p-2" style="background-color:#594ae2;border-bottom-left-radius:5px;border-top-left-radius:5px;min-width:250px;">
+
+                <div class="container p-2 d-flex flex-column my-auto ">
+
+                    <MudText Align="Align.Center" Style="color:white">
+                        <MudIcon Icon="@Icons.Material.Filled.Store" Size="Size.Large" Style="color:white;"></MudIcon>
+                        Suka Online Store
+                    </MudText>
+                    <MudSpacer></MudSpacer>
+
+                    <span class="text-white mt-4 p-4 text-start">
+                        <MudText>
+                            <MudIcon Icon="@Icons.Material.Filled.FormatQuote" Size="Size.Large" Style="color:white;"></MudIcon>
+                            Discover the latest Products at Suka.
+                            Shop with ease and convenience from the comfort of your own home.
+                            Get ready to elevate your Shopping game with us!
+                        </MudText>
+                    </span>
+
+                    <MudButton OnClick="NavigateToLogin" ButtonType="ButtonType.Button" Style="background-color:white;color:#594ae2" FullWidth="true">Login</MudButton>
+
+                </div>
+            </div>
+
+
+
+            <div class="col p-5" style="background-color:white;min-width:250px;">
+
+                <MudText Typo="Typo.h5" Align="Align.Center">
+                    <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary"></MudIcon>
+                    Register
+                </MudText>
+
+                <div class="my-auto form-elements">
+
+                    <MudTextField Style="min-width:100%" @bind-Value="Client.Username" Label="username" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.SupervisedUserCircle" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Dense" ></MudTextField>
+                    <ValidationMessage For="(() => Client.Username)"></ValidationMessage>
+                    <p style="color:red">@usernameExistsError</p>
+
+
+                    <MudTextField  InputType="InputType.Password" @bind-Value="Client.Password" Label="password" FullWidth="true" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Lock" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+                    <ValidationMessage For="(() => Client.Password)"></ValidationMessage>
+
+
+
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Class="mt-3" Variant="Variant.Filled" FullWidth="true">Register</MudButton>
+                </div>
+            </div>
+        </div>
+
+    </EditForm>
+</MudContainer>
+<style>
+    .form{
+        transform:translateX(25%);
+    }
+
+    .form-elements{
+        height:100%;
+        transform:translateY(25%);
+        background-color: transparent;
+    }
+</style>
+
+@code {
+
+}

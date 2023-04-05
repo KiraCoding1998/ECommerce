@@ -1,0 +1,38 @@
+﻿
+<MudPaper Width="250px" Elevation="0" Class="py-3">
+
+
+    
+    <MudSparkLine/>
+    <AuthorizeView Roles="True">
+
+        <MudNavMenu Color="Color.Dark">
+            <MudNavLink IconColor="Color.Info" Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink  IconColor="Color.Secondary" Href="/explore" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TravelExplore">Explore</MudNavLink>
+            <MudNavLink IconColor="Color.Success" Href="/create" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Create">Create</MudNavLink>
+            <MudNavLink IconColor="Color.Tertiary" Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+        </MudNavMenu>
+
+
+    </AuthorizeView>
+
+
+    <AuthorizeView Roles="False">
+        <MudNavMenu Color="Color.Dark">
+            <MudNavLink IconColor="Color.Info" Href="/home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink IconColor="Color.Secondary" Href="/explore" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TravelExplore">Explore</MudNavLink>
+            <MudNavLink IconColor="Color.Tertiary" Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+        </MudNavMenu>
+
+
+    </AuthorizeView>
+
+
+    <AuthorizeView>
+        <NotAuthorized>
+            <MudNavLink IconColor="Color.Tertiary" Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About Us</MudNavLink>
+            <MudNavLink IconColor="Color.Secondary" Href="/explore" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TravelExplore">Explore</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+
+</MudPaper>

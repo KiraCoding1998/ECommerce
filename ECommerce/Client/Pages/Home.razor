@@ -1,0 +1,88 @@
+﻿@page "/home"
+@layout SecondaryLayout
+@using System.Security.Claims;
+@using ECommerce.Shared.Models;
+@using Microsoft.AspNetCore.Authorization;
+@using Newtonsoft.Json;
+
+@attribute [Authorize]
+
+@* True Role means that they're an admin*@
+<AuthorizeView Roles="True">
+   <h1>
+       this region show the admin who visited the webite and stuff
+   </h1>
+</AuthorizeView>
+
+@* False Role for non-admin Users*@
+<AuthorizeView Roles="False">
+    <Authorized>
+        
+        <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+            <div class="row" style="width:100%;height:100vh;">
+                <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">
+        @foreach (var product in _productsOwned)
+        {
+            <ECommerce.Client.Components.ProductOwnedCard Product="product"></ECommerce.Client.Components.ProductOwnedCard>
+        }
+                </div>
+            </div>
+        </MudPaper>
+    </Authorized>
+</AuthorizeView>
+
+
+
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState>? authenticationState { get; set; }
+
+
+    private List<OwnedProductModel> _productsOwned = new List<OwnedProductModel>();
+    private List<ProductDto> Products = new List<ProductDto>();
+
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+    [Inject]
+    public HttpClient Http { get; set; }
+
+    private List<Claim> userClaims = new List<Claim>();
+
+    private async Task GetCurrentClientProduct()
+    {
+        var response = await Http.GetFromJsonAsync<List<OwnedProductModel>>($"api/clients/getclientproducts");
+
+        if(response != null)
+        {
+            _productsOwned = response;
+        }
+    }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var state = await authenticationState!;
+
+        if(state != null)
+        {
+            userClaims = state.User.Claims.ToList();
+
+            var role = state.User.FindFirst(ClaimTypes.Role);
+
+            if(role!.Value.Contains("False"))
+            {
+                await GetCurrentClientProduct();
+            }
+        }
+
+
+
+
+    }
+
+    
+
+}

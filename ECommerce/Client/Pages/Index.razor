@@ -1,0 +1,75 @@
+﻿@page "/"
+@layout SecondaryLayout
+@using ECommerce.Shared.Models;
+@using Newtonsoft.Json;
+<PageTitle>Index</PageTitle>
+
+
+@if (_isloading)
+{
+    <div class="container position-absolute top-50 bottom-50" style="left:25%;right:25%">
+        <ECommerce.Client.Components.MainLoader />
+    </div>
+}
+else
+{
+    <ECommerce.Client.Components.ImageSlider></ECommerce.Client.Components.ImageSlider>
+
+    if (_products!.Count == 0)
+    {
+        <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+            <div class="row" style="width:100%;height:100vh;">
+                <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">
+                    <MudText Align="Align.Center" Typo="Typo.caption"> No producs available atm</MudText>
+                </div>
+            </div>
+        </MudPaper>
+    }
+}
+
+
+
+<div class="d-flex flex-wrap align-items-center justify-content-center">
+    <MudPaper Style="height:100vh; width:100%;" Outlined="true" Class="border-hidden pa-4" Elevation="0">
+        <div class="row" style="width:100%;height:100vh;">
+            <div class="col d-flex justify-content-center align-items-center flex-wrap gap-3">
+                @foreach (var product in _products!)
+                {
+                    if (product.PiecesAvaliable != 0)
+                    {
+                        <ECommerce.Client.Components.ProductCard  Product="product"></ECommerce.Client.Components.ProductCard>
+                    }
+                }
+            </div>
+        </div>
+    </MudPaper>
+</div>
+
+
+@code{
+    private List<ProductDto> _products = new List<ProductDto>();
+    private bool _isloading = false;
+
+
+    [Inject]
+    public HttpClient Http { get; set; }
+
+    private async Task GetProducts()
+    {
+        _isloading = true;
+        var response = await Http.GetFromJsonAsync<List<ProductDto>>("api/products/getsomeproducts");
+
+        if (response != null || response?.Count > 0)
+        {
+            _products = response;
+        }
+
+        _isloading = false;
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProducts();
+    }
+}

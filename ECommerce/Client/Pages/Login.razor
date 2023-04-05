@@ -1,0 +1,17 @@
+﻿@page "/login"
+@layout SecondaryLayout
+
+
+<style>
+    body
+    {
+        background-image: url('/images/background.jpg');
+        background-size:cover;
+        background-repeat:no-repeat;
+
+    }
+</style>
+<Animate Animation="Animations.ZoomOutDown" Duration="TimeSpan.FromSeconds(2)">
+    <ECommerce.Client.Components.LoginForm Client="Client"></ECommerce.Client.Components.LoginForm>
+</Animate>
+

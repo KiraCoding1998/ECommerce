@@ -1,0 +1,22 @@
+﻿<InputText style="@Style" type="text" placeholder="Search Product"  @bind-Value="@searchText" class="input-with-icon form-control bg-dark search-box"  @oninput="@(e => Search(e?.Value?.ToString()))"  />
+
+
+@code {
+    public string searchText { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    [Parameter]
+    public string Style { get; set; } = string.Empty;
+
+    private async Task Search(string? value)
+    {
+        if(value == null)
+        {
+            value = string.Empty;
+        }
+        searchText = value;
+        await OnSearch.InvokeAsync(searchText);
+    }
+}

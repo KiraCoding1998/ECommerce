@@ -1,0 +1,34 @@
+﻿@using ECommerce.Client.Classes;
+@inject AuthenticationStateProvider authProvider
+@inject NavigationManager navmanager
+
+<AuthorizeView>
+    <Authorized>
+        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Secondary" @onclick="Logout">Logout</MudButton>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudButton ButtonType="ButtonType.Button" Style="margin-right:3px;" Variant="Variant.Outlined" Color="Color.Primary" @onclick="Login">Login</MudButton>
+        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Secondary" @onclick="Register">Signup</MudButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    private void Login()
+    {
+        navmanager.NavigateTo("login");
+    }
+
+    private void Register()
+    {
+        navmanager.NavigateTo("register");
+    }
+
+    private void Logout()
+    {
+        var auth = ((CustomAuthenticationStateProvider)authProvider).RemoveAuthenticationState("token");
+        navmanager.NavigateTo("/");
+
+    }
+}
